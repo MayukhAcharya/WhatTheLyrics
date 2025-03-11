@@ -9,8 +9,11 @@
   "author": "mayukh",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.8.2",
+    "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-validator": "^7.2.1",
     "nodemon": "^3.1.9"
   }
 }
