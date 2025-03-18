@@ -13,6 +13,7 @@ const lyricsHandler = async (req, res) => {
   }
   const { song } = req.params;
   const updateSongWithSpace = song.replace(" ", "%20");
+
   try {
     if (song === "" || song === " ") {
       return res.status(400).send({
@@ -29,16 +30,44 @@ const lyricsHandler = async (req, res) => {
         },
       }
     );
+
     const songUrl = response.data.response.hits[0].result.url;
+    const songName = response.data.response.hits[0].result.title;
+    let allArtists = response.data.response.hits[0].result.artist_names;
+
     const lyricsUrl = await fetch(songUrl);
     const lyricsText = await lyricsUrl.text();
 
     const $ = cheerio.load(lyricsText);
-    const lyricsInHtml = $('<div [data-lyrics-container="true"]>');
+    const lyricsFromHtml = $("div[data-lyrics-container=true]");
+    const albumData = $(".PrimaryAlbum__Title-sc-ed119306-4").text();
 
-    return res.status(200).send({
-      lyrics,
-    });
+    let lyrics = "";
+    lyricsFromHtml.each((_, element) => {
+      lyrics += cheerio
+        .load(cheerio.load(element).html().replace(/<br>/gi, "\n"))
+        .text();
+      lyrics += "\n";
+    }); //in this traversal cheerio gets into every div where the lyrics are loaded and replaces the <br> with "\n" and ultimately converts it into a plain text
+
+    if (allArtists === "Genius Romanizations") {
+      const fullTitleSong = response.data.response.hits[0].result.full_title;
+      allArtists = fullTitleSong.split("-")[0].trim();
+    }
+
+    if (lyricsFromHtml) {
+      return res.status(200).send({
+        songName: songName,
+        songArtist: allArtists,
+        songAlbum: albumData,
+        lyrics: lyrics,
+      });
+    } else {
+      return res.status(400).send({
+        message: "Lyrics not found",
+        status: false,
+      });
+    }
   } catch (error) {
     return res.status(500).send({
       message: "Error",
