@@ -5,6 +5,6 @@ const lyrics = require("./api/lyrics");
 
 app.use(express.json());
 
-app.get("/api/lyrics/:song", lyrics.lyricsSchema, lyrics.lyricsHandler);
+app.get("/lyrics/:song", lyrics.lyricsSchema, lyrics.lyricsHandler);
 
 app.listen(3000);
