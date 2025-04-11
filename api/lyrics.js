@@ -61,6 +61,7 @@ const lyricsHandler = async (req, res) => {
         songArtist: allArtists,
         songAlbum: albumData,
         lyrics: lyrics,
+        status: true,
       });
     } else {
       return res.status(400).send({
